@@ -1,0 +1,17 @@
+{
+  "include": [
+    "."
+  ],
+  "extraPaths": [
+    "C:\\Users\\salva\\AppData\\Roaming\\Python\\Python313\\site-packages",
+    "C:\\Python313\\Lib\\site-packages",
+    "c:\\xampp\\htdocs\\Octavio",
+    "c:\\xampp\\htdocs\\Octavio\\services",
+    "c:\\xampp\\htdocs\\Octavio\\data"
+  ],
+  "typeCheckingMode": "off",
+  "reportMissingImports": "none",
+  "reportMissingTypeStubs": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportUndefinedVariable": "none"
+}
