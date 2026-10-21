@@ -2683,6 +2683,12 @@ const app = {
         container.innerHTML = summary.resenas.map(r => {
           const starsText = "★".repeat(r.calificacion) + "☆".repeat(5 - r.calificacion);
           const fechaStr = r.fecha ? new Date(r.fecha).toLocaleDateString("es-MX", { year: "numeric", month: "short", day: "numeric" }) : "";
+          const parts = (r.comentario || "").split("|||IMAGES|||");
+          const cleanComment = parts[0] ? parts[0].trim() : "";
+          const imgs = parts[1] ? parts[1].split(",").map(s => s.trim()).filter(Boolean) : [];
+          const imgsHtml = imgs.length > 0
+            ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;">${imgs.map(u => `<img src="${u}" alt="Foto reseña" style="width:90px;height:68px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;">`).join("")}</div>`
+            : "";
           
           return `
             <div class="review-card-item" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
@@ -2694,7 +2700,8 @@ const app = {
                 <small style="color: #64748b;">${fechaStr}</small>
               </div>
               <h5 style="margin: 4px 0 6px 0; font-size: 0.95rem; color: #1e293b;">${r.titulo}</h5>
-              <p style="margin: 0 0 8px 0; font-size: 0.85rem; color: #475569; line-height: 1.4;">${r.comentario}</p>
+              <p style="margin: 0 0 8px 0; font-size: 0.85rem; color: #475569; line-height: 1.4;">${cleanComment}</p>
+              ${imgsHtml}
               <div style="display: flex; justify-content: flex-start;">
                 <span class="badge-status badge-confirmada" style="font-size: 0.7rem; padding: 2px 6px;">
                   ✓ Verificado vía ${r.servicioExterno || "Tienda Online Alan"}
@@ -2719,11 +2726,31 @@ const app = {
     const recursoId = document.getElementById("reviewRecursoId").value;
     const rating = parseInt(document.getElementById("reviewRatingVal").value || "5");
     const titulo = document.getElementById("reviewTitle").value.trim();
-    const comentario = document.getElementById("reviewComment").value.trim();
+    let comentario = document.getElementById("reviewComment").value.trim();
+    const imgUrlInput = document.getElementById("reviewImageUrl");
+    const imgFileInput = document.getElementById("reviewImageFile");
 
     if (!titulo || !comentario) {
       this.showToast("Por favor completa el título y el comentario.", "warning");
       return;
+    }
+
+    const imagesList = [];
+    if (imgUrlInput && imgUrlInput.value.trim()) {
+      imagesList.push(imgUrlInput.value.trim());
+    }
+    if (imgFileInput && imgFileInput.files && imgFileInput.files[0]) {
+      const file = imgFileInput.files[0];
+      const dataUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+      if (dataUrl) imagesList.push(dataUrl);
+    }
+    if (imagesList.length > 0) {
+      comentario = `${comentario} |||IMAGES|||${imagesList.join(",")}`;
     }
 
     const btn = document.getElementById("btnPublicarResena");
@@ -2759,6 +2786,8 @@ const app = {
       this.showToast("¡Reseña publicada con éxito en la Tienda Online!", "success");
       document.getElementById("reviewTitle").value = "";
       document.getElementById("reviewComment").value = "";
+      if (imgUrlInput) imgUrlInput.value = "";
+      if (imgFileInput) imgFileInput.value = "";
       await this.cargarResenasRecurso(recursoId);
       await this.cargarContabilizacion();
     } else {

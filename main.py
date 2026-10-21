@@ -149,7 +149,8 @@ async def api_tienda_test_resena(payload: dict):
         rating=int(payload.get("rating", 5)),
         title=payload.get("title", "Excelente estancia"),
         comment=payload.get("comment", "Habitación sumamente cómoda y limpia."),
-        reservation_id=payload.get("reservation_id", "")
+        reservation_id=payload.get("reservation_id", ""),
+        images=payload.get("images", [])
     )
 
 # Directorio de archivos estáticos para la interfaz web moderna
@@ -166,4 +167,4 @@ if __name__ == "__main__":
     print("  -> Interfaz Web Interactiva: http://localhost:8000")
     print("  -> GraphQL Playground:       http://localhost:8000/graphql")
     print("="*70 + "\n")
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

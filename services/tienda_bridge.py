@@ -47,7 +47,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CONFIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "config_tienda.json"))
 
 DEFAULT_CONFIG = {
-    "ngrok_url": "https://31f4-187-245-209-194.ngrok-free.app",
+    "ngrok_url": "https://3fb4-187-245-209-194.ngrok-free.app",
     "timeout_segundos": 5,
     "modo_fallback_activo": True,
     "compañero": "Alan López Medina (Tienda Online)"
@@ -411,28 +411,36 @@ def crear_resena_en_tienda(
     rating: int,
     title: str,
     comment: str,
-    reservation_id: Optional[str] = None
+    reservation_id: Optional[str] = None,
+    images: Optional[list] = None
 ) -> Dict[str, Any]:
     """
     Consume el microservicio REST de reseñas de la Tienda Online:
     POST https://TU-URL.ngrok-free.app/api/interactions/reviews
     (con fallback a /api/reviews)
 
-    Envía calificación (1-5 estrellas), título, comentario y referencias.
+    Envía calificación (1-5 estrellas), título, comentario, fotos (|||IMAGES|||) y referencias.
     """
     cfg = cargar_config_tienda()
     base_url = cfg["ngrok_url"]
     headers = obtener_headers_ngrok()
 
     calif = max(1, min(5, int(rating)))
+    final_comment = f"[{title}] {comment}".strip() if title else comment.strip()
+    if images and len(images) > 0:
+        clean_imgs = [str(img).strip() for img in images if str(img).strip()]
+        if clean_imgs and "|||IMAGES|||" not in final_comment:
+            final_comment = f"{final_comment} |||IMAGES|||{','.join(clean_imgs)}"
+
     payload = {
         "user_id": user_id,
         "user_name": user_name,
+        "product_id": item_id,
         "item_id": item_id,
         "resource_id": item_id,
         "rating": calif,
         "title": title,
-        "comment": comment,
+        "comment": final_comment,
         "reservation_id": reservation_id or ""
     }
 
