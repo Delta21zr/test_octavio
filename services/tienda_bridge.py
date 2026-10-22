@@ -47,7 +47,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CONFIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "config_tienda.json"))
 
 DEFAULT_CONFIG = {
-    "ngrok_url": "https://3fb4-187-245-209-194.ngrok-free.app",
+    "ngrok_url": "https://a69a-2806-370-3187-4a5a-652d-d25a-2052-8f81.ngrok-free.app",
     "timeout_segundos": 5,
     "modo_fallback_activo": True,
     "compañero": "Alan López Medina (Tienda Online)"
